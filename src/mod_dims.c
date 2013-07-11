@@ -677,7 +677,10 @@ dims_send_image(dims_request_rec *d)
 
     int trust_src_img = 0;
 
-    format = MagickGetImageFormat(d->wand);
+    /* If the format has been set, it takes precedence. */
+    format = MagickGetFormat(d->wand);
+    if (!format || !*format)
+	format = MagickGetImageFormat(d->wand);
 
     start_time = apr_time_now();
     blob = MagickGetImageBlob(d->wand, &length);
