@@ -680,14 +680,14 @@ dims_send_image(dims_request_rec *d)
     /* If the format has been set, it takes precedence. */
     format = MagickGetFormat(d->wand);
     if (!format || !*format)
-	format = MagickGetImageFormat(d->wand);
+        format = MagickGetImageFormat(d->wand);
 
     start_time = apr_time_now();
     blob = MagickGetImageBlob(d->wand, &length);
     d->imagemagick_time += (apr_time_now() - start_time) / 1000;
 
     /* Set the Content-Type based on the image format. */
-    content_type = apr_psprintf(d->pool, "image/%s", format);
+    content_type = MagickToMime(format);
     ap_content_type_tolower(content_type);
     ap_set_content_type(d->r, content_type);
 
@@ -800,6 +800,7 @@ dims_send_image(dims_request_rec *d)
 
     MagickRelinquishMemory(blob);
     MagickRelinquishMemory(format);
+    MagickRelinquishMemory(content_type);
     DestroyMagickWand(d->wand);
 
     /* After the image is sent record stats about this request. */
